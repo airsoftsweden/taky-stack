@@ -24,11 +24,6 @@ resource "digitalocean_droplet" "atak-docker-do" {
   }
 
   provisioner "file" {
-    source = "../secrets"
-    destination = "/opt/secrets"
-  }
-
-  provisioner "file" {
     source = "../ansible"
     destination = "/opt/ansible"
   }
