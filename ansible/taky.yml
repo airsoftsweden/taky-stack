@@ -1,0 +1,8 @@
+---
+  - hosts: localhost
+    gather_facts: no
+
+    tasks:
+      - import_tasks: playbooks/update_apt.yml
+      - import_tasks: playbooks/docker.yml
+      - import_tasks: playbooks/taky-docker.yml

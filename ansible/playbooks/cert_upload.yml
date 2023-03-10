@@ -1,0 +1,23 @@
+---
+- name: UPLOAD - ATAK Cert
+  command: 
+    chdir: /opt/certs
+    argv:
+      - "/usr/bin/curl"
+      - "--upload-file"
+      - "./ATAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+      - "https://transfer.sh/ATAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+  register: atak
+
+- name: UPLOAD - ITAK Cert
+  command: 
+    chdir: /opt/certs
+    argv:
+      - "/usr/bin/curl"
+      - "--upload-file"
+      - "./ITAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+      - "https://transfer.sh/ITAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+  register: itak
+
+- debug: msg="{{ atak.stdout }}"
+- debug: msg="{{ itak.stdout }}"

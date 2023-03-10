@@ -1,0 +1,44 @@
+---
+- name: Install required archive packages
+  apt:
+    pkg:
+      - unzip
+      - zip
+      - lzma
+    state: latest
+    update_cache: true
+    lock_timeout: 180
+
+- name: Install lxml module
+  pip:
+    name: lxml
+
+- name: ITAK Cert generation through Docker-Exec
+  community.docker.docker_container_exec:
+    container: taky-cot
+    argv: 
+      - /bin/bash 
+      - "-c"
+      - "cd /data/; takyctl -c /data/conf/taky.conf build_client --is_itak itak"
+
+- name: Remove old itak cert folder
+  file:
+    path: /opt/certs/itak
+    state: absent
+
+- name: Create /opt/certs
+  file:
+    path: /opt/certs/itak
+    state: directory
+    mode: '0755'
+
+- name: unzip iTAK.zip
+  unarchive:
+    src: /docker/data/taky-data/itak.zip
+    dest: /opt/certs/itak
+
+- name: ITAK Cert - Zip folder
+  community.general.archive:
+    path: /opt/certs/itak/*
+    dest: "/opt/certs/ITAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+    format: zip

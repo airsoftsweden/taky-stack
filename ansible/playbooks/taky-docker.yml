@@ -1,0 +1,11 @@
+---
+- name: Pull Taky image
+  docker_image:
+    name: skadakar/taky:latest
+    source: pull
+
+- name: Docker Compose Up Taky
+  docker_compose:
+    project_src: docker/
+    files: 
+      - docker-compose.yml

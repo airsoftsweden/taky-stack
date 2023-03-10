@@ -1,0 +1,56 @@
+version: "3"
+services:
+  taky-bot:
+    image: securitybits/taky-telegram
+    container_name: taky-bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - CERT_PASS=${KEY_PW}
+      - IP=${IP}
+    volumes:
+      - /docker/data/taky-data:/data
+
+  taky-map:
+    container_name: taky-map
+    image: skadakar/taky-worldmap
+    user: root
+    ports:
+      - 1881:1881
+    environment:
+      - PORT=1881
+      - COT_IP=${IP}
+      - COT_PORT=8089
+      - COT_ENDPOINT=${ENDPOINT}
+    volumes:
+      - /docker/data/taky-data/ssl/ca.crt:/data/certs/ca.pem:ro
+      - /docker/data/taky-data/ssl/server.crt:/data/certs/server.pem:ro
+      - /docker/data/taky-data/ssl/server.key:/data/certs/server.key:ro
+    restart: unless-stopped
+
+  taky-rtsp:
+    container_name: taky-rtsp
+    image: aler9/rtsp-simple-server
+    ports:
+      - 1935:1935
+      - 8554:8554
+      - 8888:8888
+    environment:
+      - RTSP_PROTOCOLS=tcp
+    restart: unless-stopped
+
+  taky-sidecar:
+    container_name: taky-sidecar
+    image: skadakar/taky-rtsp-sidecar:latest
+    ports:
+      - "1880:1880"
+    environment:
+      - COT_IP=${IP}
+      - COT_PORT=8089
+    volumes:
+      - /docker/data/taky-data/ssl/ca.crt:/data/certs/ca.pem:ro
+      - /docker/data/taky-data/ssl/server.crt:/data/certs/server.pem:ro
+      - /docker/data/taky-data/ssl/server.key:/data/certs/server.key:ro
+    restart: unless-stopped
+    depends_on:
+      - taky-rtsp

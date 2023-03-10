@@ -1,0 +1,17 @@
+---
+- name: "Update"
+  apt:
+    update_cache: yes
+
+- name: Wait for lock-frontend to be released
+  shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done; 
+
+- name: remove apt lock File
+  file:
+    state: absent
+    path: "/var/lib/dpkg/lock"
+
+- name: Remove apt Lock File
+  file: 
+    state: absent
+    path: "/var/lib/dpkg/lock-frontend"

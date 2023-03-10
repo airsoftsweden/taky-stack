@@ -1,0 +1,85 @@
+---
+- name: Install required archive packages
+  apt:
+    pkg:
+      - unzip
+      - zip
+      - lzma
+    state: latest
+    update_cache: true
+    lock_timeout: 180
+
+- name: Install lxml module
+  pip:
+    name: lxml
+
+- name: ATAK Cert generation through Docker-Exec
+  community.docker.docker_container_exec:
+    container: taky-cot
+    argv: 
+      - /bin/bash 
+      - "-c"
+      - "cd /data/; takyctl -c /data/conf/taky.conf build_client atak"
+
+- name: Remove old atak cert folder
+  file:
+    path: /opt/certs/atak
+    state: absent
+
+- name: Create /opt/certs
+  file:
+    path: /opt/certs/atak
+    state: directory
+    mode: '0755'
+
+- name: unzip ATAK.zip
+  unarchive:
+    src: /docker/data/taky-data/atak.zip 
+    dest: /opt/certs/atak
+
+- name: ATAK Cert - Add static files
+  copy:
+    src: /opt/ansible/certs/atak/static/
+    dest: /opt/certs/atak/certs/
+
+- name: MANIFEST.xml - Set Server Name
+  community.general.xml:
+    path: /opt/certs/atak/MANIFEST/manifest.xml
+    xpath: /MissionPackageManifest/Configuration/Parameter[@name="name"]
+    attribute: value
+    value: "{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper }}"
+
+- name: MANIFEST.xml - Set Server Name
+  community.general.xml:
+    path: /opt/certs/atak/MANIFEST/manifest.xml
+    xpath: /MissionPackageManifest/Configuration/Parameter[@name="onReceiveDelete"]
+    attribute: value
+    value: "false"
+
+- name: MANIFEST.xml - Remove Contents
+  community.general.xml:
+    path: /opt/certs/atak/MANIFEST/manifest.xml
+    xpath: /MissionPackageManifest/Contents/Content
+    state: absent
+
+- name: MANIFEST.xml - Register included files
+  find:
+    paths: /opt/certs/atak/certs/
+    file_type: file
+  register: filelist
+
+- name: MANIFEST.xml - Add Contents
+  community.general.xml:
+    path: /opt/certs/atak/MANIFEST/manifest.xml
+    xpath: /MissionPackageManifest/Contents
+    add_children:
+      - content:
+          ignore: "false"
+          zipEntry: "certs/{{ item.path | basename }}"
+  with_items: "{{ filelist.files  }}"
+    
+- name: ATAK Cert - Zip folder
+  community.general.archive:
+    path: /opt/certs/atak/*
+    dest: "/opt/certs/ATAK-{{ lookup('ansible.builtin.env', 'TAKY_SERVER') | upper}}.zip"
+    format: zip
