@@ -17,6 +17,14 @@ variable "cert_pass" {
   default = "atakatak"
   type = string
 }
+variable "map_endpoint" {
+  default = "map"
+  type = string
+}
+variable "telegram_token" {
+  default = "NONE"
+  type = string
+}
 
 variable "ssh_fingerprint" {
   type = string  

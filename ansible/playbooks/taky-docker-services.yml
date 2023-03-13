@@ -1,0 +1,26 @@
+---
+- name: Pull Telegram image
+  docker_image:
+    name: securitybits/taky-telegram:latest
+    source: pull
+
+- name: Pull Worldmap image
+  docker_image:
+    name: skadakar/taky-worldmap:latest
+    source: pull
+
+- name: Pull rtsp image
+  docker_image:
+    name: aler9/rtsp-simple-server:latest
+    source: pull
+
+- name: Pull sidecar image
+  docker_image:
+    name: skadakar/taky-rtsp-sidecar:latest
+    source: pull
+
+- name: Docker Compose Up Taky
+  docker_compose:
+    project_src: docker/
+    files: 
+      - docker-compose-services.yml

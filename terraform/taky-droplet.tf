@@ -28,6 +28,9 @@ resource "digitalocean_droplet" "atak-docker-do" {
     destination = "/opt/ansible"
   }
 
+#ENDPOINT
+#TELEGRAM_TOKEN
+
   provisioner "remote-exec" {
     inline = [
       "cd /root",
@@ -35,7 +38,9 @@ resource "digitalocean_droplet" "atak-docker-do" {
       "echo 'export IP=${var.servers[count.index]}.airsoftsweden.com' >> .bash_profile",
       "echo 'export ID=ATAK-${var.servers[count.index]}' >> .bash_profile",
       "echo 'export KEY_PW=${var.cert_pass}' >> .bash_profile",
-      "echo 'export SERVER_P12_PW=${var.cert_pass}' >> .bash_profile"
+      "echo 'export SERVER_P12_PW=${var.cert_pass}' >> .bash_profile",
+      "echo 'export ENDPOINT=${var.map_endpoint}' >> .bash_profile",
+      "echo 'export TELEGRAM_TOKEN=${var.telegram_token}' >> .bash_profile"
     ]
   }
 
@@ -46,6 +51,8 @@ resource "digitalocean_droplet" "atak-docker-do" {
       "export ID=ATAK-${var.servers[count.index]}",
       "export KEY_PW=${var.cert_pass}",
       "export SERVER_P12_PW=${var.cert_pass}",
+      "export ENDPOINT=${var.map_endpoint}",
+      "export TELEGRAM_TOKEN=${var.telegram_token}",
       "cd /opt/ansible",
       "ansible-galaxy collection install -r requirements.yml",
       "ansible-playbook -i ansible_hosts taky.yml"

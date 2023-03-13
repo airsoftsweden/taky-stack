@@ -1,0 +1,6 @@
+---
+  - hosts: localhost
+    gather_facts: no
+
+    tasks:
+      - import_tasks: playbooks/taky-docker-services.yml
