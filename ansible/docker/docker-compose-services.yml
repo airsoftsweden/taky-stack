@@ -35,6 +35,7 @@ services:
       - 1935:1935
       - 8554:8554
       - 8888:8888
+      - 9997:9997
     environment:
       - RTSP_PROTOCOLS=tcp
     restart: unless-stopped
@@ -45,7 +46,7 @@ services:
     ports:
       - "1880:1880"
     environment:
-      - COT_IP=${IP}
+      - COT_IP=127.0.0.1
       - COT_PORT=8089
     volumes:
       - /docker/data/taky-data/ssl/ca.crt:/data/certs/ca.pem:ro
